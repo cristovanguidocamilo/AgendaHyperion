@@ -1,0 +1,16 @@
+program AgendaHyperion;
+
+uses
+  Vcl.Forms,
+  untPrincipal in 'untPrincipal.pas' {frmPrincipal},
+  untCadastro in 'untCadastro.pas' {frmCadastro};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.CreateForm(TfrmCadastro, frmCadastro);
+  Application.Run;
+end.

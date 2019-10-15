@@ -1,0 +1,175 @@
+unit untCadastro;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.DBCtrls,
+  Vcl.ExtCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, Data.DB, Data.Win.ADODB,
+  ZAbstractRODataset, ZAbstractDataset, ZDataset;
+
+type
+  TfrmCadastro = class(TForm)
+    Panel1: TPanel;
+    DBNavigator1: TDBNavigator;
+    DBGrid1: TDBGrid;
+    btnNovo: TBitBtn;
+    btnExcluir: TBitBtn;
+    btnAlterar: TBitBtn;
+    btnGravar: TBitBtn;
+    btnCancelar: TBitBtn;
+    Panel2: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
+    DBEdit3: TDBEdit;
+    DBEdit4: TDBEdit;
+    DBEdit5: TDBEdit;
+    DBEdit6: TDBEdit;
+    DBEdit7: TDBEdit;
+    qryConsulta: TZQuery;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure DBEdit1Exit(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastro: TfrmCadastro;
+  Status : String;
+
+implementation
+
+{$R *.dfm}
+
+uses untPrincipal;
+
+procedure TfrmCadastro.btnAlterarClick(Sender: TObject);
+begin
+  if Status = 'Normal' then
+  begin
+    Status := 'Editando';
+    btnNovo.Enabled := False;
+    btnExcluir.Enabled := False;
+    btnAlterar.Enabled := False;
+    btnGravar.Enabled := True;
+    btnCancelar.Enabled := True;
+    Panel2.Enabled := True;
+    frmPrincipal.ZQuery1.Edit;
+    DBEdit1.SetFocus;
+  end;
+end;
+
+procedure TfrmCadastro.btnCancelarClick(Sender: TObject);
+begin
+  if ((Status = 'Inserindo') or (Status = 'Editando')) then
+  begin
+    Status := 'Normal';
+    btnNovo.Enabled := True;
+    btnExcluir.Enabled := True;
+    btnAlterar.Enabled := True;
+    btnGravar.Enabled := False;
+    btnCancelar.Enabled := False;
+    Panel2.Enabled := False;
+    frmPrincipal.ZQuery1.Cancel;
+  end;
+end;
+
+procedure TfrmCadastro.btnExcluirClick(Sender: TObject);
+begin
+  if Status = 'Normal' then
+    if MessageDlg('Deseja Realmente Excluir este Cadastro?',mtConfirmation,[mbyes, mbno],0) = mryes then
+      frmPrincipal.ZQuery1.Delete;
+end;
+
+procedure TfrmCadastro.btnGravarClick(Sender: TObject);
+begin
+  if ((Status = 'Inserindo') or (Status = 'Editando')) then
+  begin
+    Status := 'Normal';
+    btnNovo.Enabled := True;
+    btnExcluir.Enabled := True;
+    btnAlterar.Enabled := True;
+    btnGravar.Enabled := False;
+    btnCancelar.Enabled := False;
+    Panel2.Enabled := False;
+    Try
+    frmPrincipal.ZQuery1.Post;
+    Finally
+      frmPrincipal.ZQuery1.Cancel;
+    End;
+  end;
+end;
+
+procedure TfrmCadastro.btnNovoClick(Sender: TObject);
+begin
+  if Status = 'Normal' then
+  begin
+    Status := 'Inserindo';
+    btnNovo.Enabled := False;
+    btnExcluir.Enabled := False;
+    btnAlterar.Enabled := False;
+    btnGravar.Enabled := True;
+    btnCancelar.Enabled := True;
+    Panel2.Enabled := True;
+    frmPrincipal.ZQuery1.Insert;
+    DBEdit1.SetFocus;
+  end;
+end;
+
+procedure TfrmCadastro.DBEdit1Exit(Sender: TObject);
+begin
+  qryConsulta.SQL.Clear;
+  if ((DBEdit1.Text <> '') and (Status = 'Inserindo')) then
+  Begin
+    qryConsulta.SQL.Add('SELECT BM_NOME FROM BM_LISTA WHERE BM_RAMAL = '+DBEdit1.Text);
+    qryConsulta.Active := True;
+    if qryConsulta.FieldByName('BM_NOME').AsString <> '' then
+      if MessageDlg('Já existe um ramal com este Número! Deseja Continuar?', mtConfirmation, [mbyes, mbno],1) = mrNo then
+        btnCancelar.Click;
+  End;
+end;
+
+procedure TfrmCadastro.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    frmPrincipal.ZQuery1.Cancel;
+end;
+
+procedure TfrmCadastro.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    Close;
+  if Key = VK_F2 then
+    btnNovo.Click;
+  if Key = VK_F3 then
+    btnExcluir.Click;
+  if Key = VK_F4 then
+    btnAlterar.Click;
+  if Key = VK_F5 then
+    btnGravar.Click;
+  if Key = VK_F6 then
+    btnCancelar.Click;
+end;
+
+procedure TfrmCadastro.FormShow(Sender: TObject);
+begin
+  Status := 'Normal';
+end;
+
+end.

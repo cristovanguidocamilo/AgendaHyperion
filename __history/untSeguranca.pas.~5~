@@ -1,0 +1,40 @@
+unit untSeguranca;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmSeguranca = class(TForm)
+    DBEdit1: TDBEdit;
+    Label1: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmSeguranca: TfrmSeguranca;
+
+implementation
+
+{$R *.dfm}
+
+uses untPrincipal;
+
+procedure TfrmSeguranca.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  frmPrincipal.ADOQuery2.Post;
+end;
+
+procedure TfrmSeguranca.FormShow(Sender: TObject);
+begin
+  frmPrincipal.ADOQuery2.Edit;
+end;
+
+end.

@@ -1,0 +1,18 @@
+program AgendaHyperion;
+
+uses
+  Vcl.Forms,
+  untPrincipal in 'untPrincipal.pas' {frmPrincipal},
+  untCadastro in 'untCadastro.pas' {frmCadastro},
+  untSeguranca in 'untSeguranca.pas' {frmSeguranca};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.Title := 'Hyperion - Agenda Personalizada';
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.CreateForm(TfrmSeguranca, frmSeguranca);
+  Application.Run;
+end.
